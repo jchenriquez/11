@@ -39,6 +39,7 @@ func maxAreaHelper(height []int, memo map[string]int, i, j int) int {
 
 func areaHelper(height []int, start, end, incr int) int {
 	area := height[start] * height[start+incr]
+  var maxPillar int
 
 	if height[start] > height[start+incr] {
 		maxPillar = start
@@ -61,9 +62,6 @@ func areaHelper(height []int, start, end, incr int) int {
 
 // MaxArea will return the maxAre of a given measured container
 func MaxArea(height []int) int {
-
-	var maxPillar int
-
 	area := areaHelper(height, 0, len(height), 1)
-	area = int(math.Max(float64()))
+	return int(math.Max(float64(area), float64(areaHelper(height, len(height)-1, -1, -1))))
 }
