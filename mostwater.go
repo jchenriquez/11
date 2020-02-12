@@ -1,74 +1,49 @@
 package mostwater
 
 import (
-	"fmt"
 	"math"
 )
 
-func toKey(i, j int) string {
-	return fmt.Sprintf("%d,%d", i, j)
-}
-
-func maxAreaHelper(height []int, memo map[string]int, i, j int) int {
-	area := (j - i) * int(math.Min(float64(height[i]), float64(height[j])))
-	if j-i == 1 {
-		return area
-	}
-
-	key := toKey(i, j)
-
-	if val, saw := memo[key]; saw {
-		return val
-	}
-
-	var area1 int
-	var area2 int
-
-	if float64(height[j-1]) > math.Min(float64(height[i]), float64(height[j])) {
-		area1 = maxAreaHelper(height, memo, i, j-1)
-	}
-
-	if float64(height[i+1]) > math.Min(float64(height[i]), float64(height[j])) {
-		area2 = maxAreaHelper(height, memo, i+1, j)
-	}
-
-	maxArea := int(math.Max(float64(area1), float64(area2)))
-	return int(math.Max(float64(maxArea), float64(area)))
-
-}
-
-func distance(i, j int) int {
-	return int(math.Abs(float64(i - j)))
-}
-
-func areaHelper(height []int, start, end, incr int) int {
-	area := height[start] * height[start+incr]
-	var maxPillar int
-
-	if height[start] > height[start+incr] {
-		maxPillar = start
-	} else {
-		maxPillar = start + incr
-	}
-
-	for i := start + (incr * 2); i != end; i += incr {
-		if distance(maxPillar, i)*int(math.Min(float64(height[i]), float64(height[maxPillar]))) > area {
-			area = (i - maxPillar) * int(math.Min(float64(height[i]), float64(height[maxPillar])))
-		}
-
-		if height[i] > height[maxPillar] {
-			maxPillar = i
-		}
-	}
-
-	return area
-}
-
 // MaxArea will return the maxAre of a given measured container
 func MaxArea(height []int) int {
-	area := areaHelper(height, 0, len(height), 1)
-	area = int(math.Max(float64(area), float64(areaHelper(height, len(height)-1, -1, -1))))
 
-	fmt.Printf("area %d\n", area)
+	start := 0
+	end := len(height) - 1
+
+	area := (end - start) * int(math.Min(float64(height[start]), float64(height[end])))
+
+	for end-start >= 1 {
+		area = int(math.Max(float64(area), float64((end-start))*math.Min(float64(height[start]), float64(height[end]))))
+
+		changed := false
+		var nStart int
+		var minIndex *int
+		var nEnd int
+		var incr int
+
+		if height[start] <= height[end] {
+			nStart = start + 1
+			nEnd = end
+			minIndex = &start
+			incr = 1
+		} else {
+			nStart = end - 1
+			minIndex = &end
+			nEnd = start
+			incr = -1
+		}
+		for i := nStart; i != nEnd; i += incr {
+			if height[i] >= height[*minIndex] {
+				*minIndex = i
+				changed = true
+				break
+			}
+		}
+
+		if !changed {
+			break
+		}
+	}
+
 	return area
 }
